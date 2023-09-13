@@ -67,9 +67,19 @@ class AvacadoPredictor(object):
     def predict_color_proba(self: AvacadoPredictorType,
                             X: List[Color]
                             ) -> List[List[Tuple[GoodToEat, float]]]:
+        
         probs_per_example: List[List[Tuple[GoodToEat, float]]] = list()
-
-        # TODO: complete me!
+        
+        color_counts = {color: 0 for color in Color}
+        
+        for color in X:
+            color_counts[color] += 1
+        
+        TotalItems = len(X)
+        
+        for color in X:
+            GoodGivenColor = (self.color_given_good_to_eat_pmf[GoodToEat.YES][color] * self.good_to_eat_prior[GoodToEat.YES]) / (color_counts[color] / TotalItems)
+            probs_per_example += [[(GoodToEat.YES, GoodGivenColor), (GoodToEat.NO,1- GoodGivenColor)]]
 
         return probs_per_example
 
@@ -78,12 +88,20 @@ class AvacadoPredictor(object):
                                ) -> List[List[Tuple[GoodToEat, float]]]:
         probs_per_example: List[List[Tuple[GoodToEat, float]]] = list()
 
-        # TODO: complete me!
+        softness_counts = {softness: 0 for softness in Softness}
+        
+        for softness in X:
+            softness_counts[softness] += 1
+        
+        TotalItems = len(X)
+        
+        for softness in X:
+            GoodGivenSoftness = (self.softness_given_good_to_eat_pmf[GoodToEat.YES][softness] * self.good_to_eat_prior) / (softness_counts[softness] / TotalItems)
+            probs_per_example += [[(GoodToEat.YES, GoodGivenSoftness), (GoodToEat.NO,1- GoodGivenSoftness)]]
 
         return probs_per_example
 
 
-    """
     # EXTRA CREDIT
     def predict_color(self: AvacadoPredictorType,
                       X: List[Color]
@@ -96,7 +114,6 @@ class AvacadoPredictor(object):
                          ) -> List[GoodToEat]:
         # TODO: complete me!
         return list()
-    """
 
 
 
@@ -137,6 +154,11 @@ def main() -> None:
     print("softness given good to eat pmf")
     pprint(m.softness_given_good_to_eat_pmf)
 
+
+    color_predictions = m.predict_color_proba(color_data)
+    print(color_data)
+    print("Predictions based on color:")
+    pprint(color_predictions)
     # if you do the extra credit be sure to uncomment these lines!
     # print("accuracy when predicting only on color: ", accuracy(m.predict_color(color_data), good_to_eat_data))
 
