@@ -21,6 +21,13 @@ from data import Color, Softness, GoodToEat, load_data
 # TYPES DEFINED IN THIS MODULE
 AvacadoPredictorType: Type = Type["AvacadoPredictor"]
 
+def normalize_pmf(dict_to_be_pmf: Dict[..., float]) -> None:
+    
+    total: int = sum(dict_to_be_pmf.values())
+    
+    for key in dict_to_be_pmf.keys():
+        dict_to_be_pmf[key] /= total
+
 
 class AvacadoPredictor(object):
     def __init__(self: AvacadoPredictorType) -> None:
@@ -65,19 +72,15 @@ class AvacadoPredictor(object):
             self.color_given_good_to_eat_pmf[good_to_eat][color] += 1
             self.softness_given_good_to_eat_pmf[good_to_eat][softness] += 1
 
-        self.normalize_pmf(self.good_to_eat_prior)
+        normalize_pmf(self.good_to_eat_prior)
     
         for good_to_eat in self.good_to_eat_prior:
-            self.normalize_pmf(self.color_given_good_to_eat_pmf[good_to_eat])
-            self.normalize_pmf(self.softness_given_good_to_eat_pmf[good_to_eat])
+            normalize_pmf(self.color_given_good_to_eat_pmf[good_to_eat])
+            normalize_pmf(self.softness_given_good_to_eat_pmf[good_to_eat])
         
+        return self
 
-    def normalize_pmf(dict_to_be_pmf: Dict[..., float]) -> None:
-        
-        total: int = sum(dict_to_be_pmf.values())
-        
-        for key in dict_to_be_pmf.keys():
-            dict_to_be_pmf[key] /= total
+
             
             
         
