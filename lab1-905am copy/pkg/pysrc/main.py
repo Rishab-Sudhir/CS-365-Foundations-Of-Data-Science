@@ -33,37 +33,56 @@ class AvacadoPredictor(object):
             data: List[Tuple[Color, Softness, GoodToEat]]
             ) -> AvacadoPredictorType: 
         
-        goodToEat_count = sum(1 for _, _, good in data if good == GoodToEat.YES)
+        # goodToEat_count = sum(1 for _, _, good in data if good == GoodToEat.YES)
         
-        TotalItems = len(data)
+        # TotalItems = len(data)
         
-        self.good_to_eat_prior[GoodToEat.YES] = goodToEat_count/TotalItems
-        self.good_to_eat_prior[GoodToEat.NO] =  1 - (goodToEat_count/TotalItems)
+        # self.good_to_eat_prior[GoodToEat.YES] = goodToEat_count/TotalItems
+        # self.good_to_eat_prior[GoodToEat.NO] =  1 - (goodToEat_count/TotalItems)
         
-        color_good_to_eat_counts = {color: 0 for color in Color}
+        # color_good_to_eat_counts = {color: 0 for color in Color}
         
-        for color, _, good_to_eat in data:
-            if good_to_eat == GoodToEat.YES:
-                    color_good_to_eat_counts[color] += 1
+        # for color, _, good_to_eat in data:
+        #     if good_to_eat == GoodToEat.YES:
+        #             color_good_to_eat_counts[color] += 1
         
-        for x in Color:
-            self.color_given_good_to_eat_pmf[GoodToEat.YES][x] = color_good_to_eat_counts[x] / goodToEat_count
-            self.color_given_good_to_eat_pmf[GoodToEat.NO][x] = 1 - ( color_good_to_eat_counts[x] / goodToEat_count)
+        # for x in Color:
+        #     self.color_given_good_to_eat_pmf[GoodToEat.YES][x] = color_good_to_eat_counts[x] / goodToEat_count
+        #     self.color_given_good_to_eat_pmf[GoodToEat.NO][x] = 1 - ( color_good_to_eat_counts[x] / goodToEat_count)
           
-        softness_good_to_eat_counts = {softness: 0 for softness in Softness}
+        # softness_good_to_eat_counts = {softness: 0 for softness in Softness}
             
-        for _, softness, good_to_eat in data:
-            if good_to_eat == GoodToEat.YES:
-                    softness_good_to_eat_counts[softness] += 1
+        # for _, softness, good_to_eat in data:
+        #     if good_to_eat == GoodToEat.YES:
+        #             softness_good_to_eat_counts[softness] += 1
             
-            for x in Softness:
-                self.softness_given_good_to_eat_pmf[GoodToEat.YES][x] = softness_good_to_eat_counts[x] / goodToEat_count
-                self.softness_given_good_to_eat_pmf[GoodToEat.NO][x] = 1 - ( softness_good_to_eat_counts[x] / goodToEat_count)
+        #     for x in Softness:
+        #         self.softness_given_good_to_eat_pmf[GoodToEat.YES][x] = softness_good_to_eat_counts[x] / goodToEat_count
+        #         self.softness_given_good_to_eat_pmf[GoodToEat.NO][x] = 1 - ( softness_good_to_eat_counts[x] / goodToEat_count)
                 
-        # TODO: complete me!
+        for (color, softness, good_to_eat) in data:
+            self.good_to_eat_prior[good_to_eat] += 1
+            self.color_given_good_to_eat_pmf[good_to_eat][color] += 1
+            self.softness_given_good_to_eat_pmf[good_to_eat][softness] += 1
 
-        return self
+        self.normalize_pmf(self.good_to_eat_prior)
+    
+        for good_to_eat in self.good_to_eat_prior:
+            self.normalize_pmf(self.color_given_good_to_eat_pmf[good_to_eat])
+            self.normalize_pmf(self.softness_given_good_to_eat_pmf[good_to_eat])
+        
 
+    def normalize_pmf(dict_to_be_pmf: Dict[..., float]) -> None:
+        
+        total: int = sum(dict_to_be_pmf.values())
+        
+        for key in dict_to_be_pmf.keys():
+            dict_to_be_pmf[key] /= total
+            
+            
+        
+        
+        
     def predict_color_proba(self: AvacadoPredictorType,
                             X: List[Color]
                             ) -> List[List[Tuple[GoodToEat, float]]]:
