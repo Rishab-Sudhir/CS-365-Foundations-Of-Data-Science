@@ -21,7 +21,7 @@ from data import Color, Softness, GoodToEat, load_data
 # TYPES DEFINED IN THIS MODULE
 AvacadoPredictorType: Type = Type["AvacadoPredictor"]
 
-def normalize_pmf(dict_to_be_pmf: Dict[..., float]) -> None:
+def normalize_pmf(dict_to_be_pmf: Dict[str, float]) -> None:
     
     total: int = sum(dict_to_be_pmf.values())
     
@@ -92,16 +92,23 @@ class AvacadoPredictor(object):
         
         probs_per_example: List[List[Tuple[GoodToEat, float]]] = list()
         
-        color_counts = {color: 0 for color in Color}
+        color_counts = defaultdict(float)
         
         for color in X:
             color_counts[color] += 1
         
-        TotalItems = len(X)
+        normalize_pmf(color_counts)
         
         for color in X:
-            GoodGivenColor = (self.color_given_good_to_eat_pmf[GoodToEat.YES][color] * self.good_to_eat_prior[GoodToEat.YES]) / (color_counts[color] / TotalItems)
-            probs_per_example += [[(GoodToEat.YES, GoodGivenColor), (GoodToEat.NO,1- GoodGivenColor)]]
+            
+            ListForProbs = []
+            
+            for good_to_eat in self.good_to_eat_prior:
+                
+               XGivenColor = (self.color_given_good_to_eat_pmf[good_to_eat][color] * self.good_to_eat_prior[good_to_eat]) / (color_counts[color])
+               ListForProbs += [(good_to_eat , XGivenColor)]
+               
+            probs_per_example += [ListForProbs]
 
         return probs_per_example
 
@@ -110,16 +117,23 @@ class AvacadoPredictor(object):
                                ) -> List[List[Tuple[GoodToEat, float]]]:
         probs_per_example: List[List[Tuple[GoodToEat, float]]] = list()
 
-        softness_counts = {softness: 0 for softness in Softness}
+        softness_counts = defaultdict(float)
         
         for softness in X:
             softness_counts[softness] += 1
         
-        TotalItems = len(X)
+        normalize_pmf(softness_counts)
         
         for softness in X:
-            GoodGivenSoftness = (self.softness_given_good_to_eat_pmf[GoodToEat.YES][softness] * self.good_to_eat_prior) / (softness_counts[softness] / TotalItems)
-            probs_per_example += [[(GoodToEat.YES, GoodGivenSoftness), (GoodToEat.NO,1- GoodGivenSoftness)]]
+            
+            ListForProbs = []
+            
+            for good_to_eat in self.good_to_eat_prior:
+                
+                XGivenSoftness = (self.softness_given_good_to_eat_pmf[good_to_eat][softness] * self.good_to_eat_prior[good_to_eat]) / (softness_counts[softness])
+                ListForProbs += [(good_to_eat, XGivenSoftness)]
+                
+            probs_per_example += [ListForProbs]
 
         return probs_per_example
 
