@@ -143,13 +143,39 @@ class AvacadoPredictor(object):
                       X: List[Color]
                       ) -> List[GoodToEat]:
         # TODO: complete me!
-        return list()
+        
+        data = self.predict_color_proba(X)
+        
+        listOfBest = []
+        
+        for [(val1, val12), (val2, val22)] in data:
+            if val12 > val22:
+                listOfBest.append(val1)
+            else:
+                listOfBest.append(val2)
+            
+        return listOfBest
+            
+
 
     def predict_softness(self: AvacadoPredictorType,
                          X: List[Softness]
                          ) -> List[GoodToEat]:
         # TODO: complete me!
-        return list()
+        
+        data = self.predict_softness_proba(X)
+        
+        listOfBest = []
+        
+        for [(val1, val12), (val2, val22)] in data:
+            if val12 > val22:
+                listOfBest.append(val1)
+            else:
+                listOfBest.append(val2)
+            
+        return listOfBest
+    
+    
 
 
 
