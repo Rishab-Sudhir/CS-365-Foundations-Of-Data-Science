@@ -83,6 +83,34 @@ class BinomialDistribution(Distribution):
         return  [self.n, self.p]
 
 
+# a class for the poisson distribution
+# you will need to complete this class
+class PoissonDistribution(Distribution):
+    def __init__(self: PoissonDistributionType) -> None:
+        # controlled by parameter "lambda"
+        self.lamb: float = None
+
+    def fit(self: PoissonDistributionType,
+            X: np.ndarray               # input data to fit from
+            ) -> PoissonDistributionType:
+        summer = 0
+        TotalItems = 0
+        for row in X:
+            summer += sum(row)
+            TotalItems += len(row)
+        self.lamb = summer / TotalItems
+        # TODO: complete me!
+        return self # keep this at the end
+
+    def prob(self: PoissonDistributionType,
+             X: np.ndarray
+             ) -> np.ndarray:
+        # TODO: complete me!
+        ... # same as "pass"
+
+    def parameters(self: PoissonDistributionType) -> List[Union[float, np.ndarray]]:
+        return [self.lamb]
+
 """ EXTRA CREDIT
 class GaussianDistribution(Distribution):
     def __init__(self: GaussianDistributionType) -> None:
@@ -108,26 +136,4 @@ class GaussianDistribution(Distribution):
         return [self.mu, self.var]
 """
 
-
-# a class for the poisson distribution
-# you will need to complete this class
-class PoissonDistribution(Distribution):
-    def __init__(self: PoissonDistributionType) -> None:
-        # controlled by parameter "lambda"
-        self.lamb: float = None
-
-    def fit(self: PoissonDistributionType,
-            X: np.ndarray               # input data to fit from
-            ) -> PoissonDistributionType:
-        # TODO: complete me!
-        return self # keep this at the end
-
-    def prob(self: PoissonDistributionType,
-             X: np.ndarray
-             ) -> np.ndarray:
-        # TODO: complete me!
-        ... # same as "pass"
-
-    def parameters(self: PoissonDistributionType) -> List[Union[float, np.ndarray]]:
-        return [self.lamb]
 
