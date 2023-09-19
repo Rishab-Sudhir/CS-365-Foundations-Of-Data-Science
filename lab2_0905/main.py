@@ -70,13 +70,10 @@ class BinomialDistribution(Distribution):
         prob_list = []
         
         for row in X:
-            summer = 0.0
-            for col in row:
-                if col == 1:
-                    summer+=1
-            summer /= len(row)
-            prob_list += [summer]
-        np_Arr = np.ndarray(prob_list)
+            summer = sum(row)
+            length = len(row)
+            prob_list += [((self.p ** summer) * ((1-self.p)**(length - summer)))]
+        np_Arr = np.array(prob_list).reshape(-1, 1)
         
         return np_Arr
         # TODO: complete me!
