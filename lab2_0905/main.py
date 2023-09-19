@@ -10,7 +10,7 @@ import numpy as np                      # linear algebra & useful containers
 DistributionType: Type = Type["Distribution"]
 BinomialDistributionType = Type["BinomialDistribution"]
 PoissonDistributionType = Type["PoissonDistribution"]
-
+GaussianDistributionType = Type["GaussianDistribution"]
 
 # an abstract class for an arbitrary distribution
 # please don't touch this class
@@ -107,11 +107,21 @@ class PoissonDistribution(Distribution):
              ) -> np.ndarray:
         # TODO: complete me!
         ... # same as "pass"
+        
+        prob_list = []
+        
+        for row in X:
+            summer = sum(row)
+            length = len(row)
+            prob_list += [(((self.lamb**summer)*(np.exp(-self.lamb)))/(np.math.factorial(summer)))]
+        np_Arr = np.array(prob_list).reshape(-1, 1)
+        
+        return np_Arr
 
     def parameters(self: PoissonDistributionType) -> List[Union[float, np.ndarray]]:
         return [self.lamb]
 
-""" EXTRA CREDIT
+
 class GaussianDistribution(Distribution):
     def __init__(self: GaussianDistributionType) -> None:
         # controlled by parameters mu and var
@@ -122,7 +132,8 @@ class GaussianDistribution(Distribution):
             X: np.ndarray                   # input data to fit from
                                             # this will be a bunch of integer samples stored in a column vector
             ) -> GaussianDistributionType:
-
+        self.var = np.var(X)
+        self.mu = np.mean(X)
         # TODO: complete me!
         return self # keep this at the end
 
@@ -134,6 +145,5 @@ class GaussianDistribution(Distribution):
 
     def parameters(self: GaussianDistributionType) -> List[Union[float, np.ndarray]]:
         return [self.mu, self.var]
-"""
 
 
