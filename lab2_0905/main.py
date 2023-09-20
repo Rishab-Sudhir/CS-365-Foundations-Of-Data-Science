@@ -148,7 +148,9 @@ class GaussianDistribution(Distribution):
             summer = sum(row)
             length = len(row)
             x = summer / length
-            prob_list += [((1)/(math.sqrt((2*math.pi*self.var))))*np.exp(-(((x-self.mu)**2)/(self.var)))]
+            #x=row[0]
+            prob_list += [((1)/(math.sqrt((2*math.pi*self.var))))*np.exp(-(((x-self.mu)**2)/(2*self.var)))]
+            #[((1)/(math.sqrt(2*math.pi*self.var)))*(np.exp((-((x-self.mu)**2)/(2*self.var))))] 
         np_Arr = np.array(prob_list).reshape(-1, 1)
         
         return np_Arr
