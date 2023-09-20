@@ -1,7 +1,8 @@
 # SYSTEM IMPORTS
 from abc import abstractmethod, ABC     # you need these to make an abstract class in Python
 from typing import List, Type, Union    # Python's typing syntax
-import numpy as np                      # linear algebra & useful containers
+import numpy as np      # linear algebra & useful containers   
+import math             
 
 # PYTHON PROJECT IMPORTS
 
@@ -140,6 +141,18 @@ class GaussianDistribution(Distribution):
     def prob(self: GaussianDistributionType,
              X: np.ndarray                  # this will be a column vector where every element is a float
              ) -> np.ndarray:
+        
+        prob_list = []
+        
+        for row in X:
+            summer = sum(row)
+            length = len(row)
+            x = summer / length
+            prob_list += [((1)/(math.sqrt((2*math.pi*self.var))))*np.exp(-(((x-self.mu)**2)/(self.var)))]
+        np_Arr = np.array(prob_list).reshape(-1, 1)
+        
+        return np_Arr
+        
         # TODO: complete me!
         ... # same as "pass"
 
