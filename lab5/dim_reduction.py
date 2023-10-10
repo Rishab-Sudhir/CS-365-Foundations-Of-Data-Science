@@ -55,7 +55,7 @@ def randomly_project(X: np.ndarray,                     # the original dataset
     # this function should return a pair:
     #   (f, X_reduced)
     check_2d(X)
-    d = X.shape[1]
+    d = X.shape[1] #returns the number of columns and therefore the number of dimensions
     A = np.random.normal(loc=0,scale = 1, size=(d,k)) #Creating a randomly populated normal matrix 
     #Loc = mean , Scale = Standard Deviation,  size = (rows, columns)
     A = A/np.sqrt(k) #Function f being applied to A
@@ -76,7 +76,23 @@ def check_if_distance_satisfied(X: np.ndarray,          # the original dataset
     check_2d(X)
     check_2d(X_reduced)
     check_same_num_examples(X, X_reduced)
-
+    
+    n = X.shape[0] #returns the number of rows and therefore the number of data points
+    
+    for i in range(n):
+        for j in range(i + 1, n):  # Avoid duplicate pairs and self-comparison
+            # Compute the Euclidean distance between x_i and x_j in the original space
+            dist_in_og_space = np.linalg.norm(X[i, :] - X[j, :], ord=2)
+            
+            # Compute the Euclidean distance between x_i and x_j in the reduced space
+            dist_in_reduced_space = np.linalg.norm(X_reduced[i, :] - X_reduced[j, :], ord=2)
+            
+            # Check the Johnson-Lindenstrauss lemma conditions
+            if not ((1 - epsilon) * dist_in_og_space <= dist_in_reduced_space <= (1 + epsilon) * dist_in_og_space):
+                print(f"The lemma is not satisfied for points i = {i} and j = {j}")
+                return False
+    
+    return True
     # TODO: complete me!
 
 
@@ -88,6 +104,21 @@ def reduce_dims_randomly(X: np.ndarray,                 # the original dataset
     #   (f, X_reduced, num_iterations)
 
     # TODO: complete me!
+    
+    num_iter = 0
+    stop = False
+    
+    #While the Johnson-Lindenstrauss lemma is not true repeat
+    while not stop:
+        A, X_reduced = randomly_project(X, k)
+        #Create a random projection, and use it to create the reduced matrix
+        
+        stop = check_if_distance_satisfied(X, X_reduced, epsilon)
+        #check if the geometry of the reduced matrix is the same as the original
+        
+        num_iter += 1
+    
+    return A, X_reduced, num_iter 
     ...
 
 
