@@ -55,7 +55,15 @@ def randomly_project(X: np.ndarray,                     # the original dataset
     # this function should return a pair:
     #   (f, X_reduced)
     check_2d(X)
-
+    d = X.shape[1]
+    A = np.random.normal(loc=0,scale = 1, size=(d,k)) #Creating a randomly populated normal matrix 
+    #Loc = mean , Scale = Standard Deviation,  size = (rows, columns)
+    A = A/np.sqrt(k) #Function f being applied to A
+    # X is n x d and A is d x k, Doing X @ A returns a reduced Matrix of size d x k
+    X_reduced = X @ A
+    
+    return A, X_reduced
+    
     # TODO: complete me!
 
 
