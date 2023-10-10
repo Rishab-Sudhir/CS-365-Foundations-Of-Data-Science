@@ -1,0 +1,145 @@
+\documentclass[11pt]{article}
+
+%\usepackage{geometry}
+\usepackage[paper=a4paper, 
+            left=20.0mm, right=20.0mm, 
+            top=25.0mm, bottom=25.0mm]{geometry}
+\pagestyle{empty}
+\usepackage{graphicx}
+\usepackage{fancyhdr, lastpage, bbding, pmboxdraw}
+\usepackage[usenames,dvipsnames]{color}
+\definecolor{darkblue}{rgb}{0,0,.6}
+\definecolor{darkred}{rgb}{.7,0,0}
+\definecolor{darkgreen}{rgb}{0,.6,0}
+\definecolor{red}{rgb}{.98,0,0}
+\usepackage[colorlinks,pagebackref,pdfusetitle,urlcolor=darkblue,citecolor=darkblue,linkcolor=darkred,bookmarksnumbered,plainpages=false]{hyperref}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{ \fancyplain{}{Course Name} }
+%\chead{ \fancyplain{}{} }
+\rhead{ \fancyplain{}{\today} }
+%\rfoot{\fancyplain{}{page \thepage\ of \pageref{LastPage}}}
+\fancyfoot[RO, LE] {Page \thepage\ of \textcolor{black}{\pageref{LastPage}} }
+\thispagestyle{plain}
+
+%%%%%%%%%%%% LISTING %%%
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+\usepackage{verbatim} % used to display code
+\usepackage{fancyvrb}
+\usepackage{acronym}
+\usepackage{amsthm, amsmath}
+\usepackage{tikz}
+    \usetikzlibrary{calc, arrows, arrows.meta, positioning}
+
+\VerbatimFootnotes % Required, otherwise verbatim does not work in footnotes!
+
+\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\definecolor{CadetBlue}{cmyk}{0.62,0.57,0.23,0}
+\definecolor{lightlightgray}{gray}{0.93}
+
+\lstset{
+	%language=bash,                          % Code langugage
+	basicstyle=\ttfamily,                   % Code font, Examples: \footnotesize, \ttfamily
+	keywordstyle=\color{OliveGreen},        % Keywords font ('*' = uppercase)
+	commentstyle=\color{gray},              % Comments font
+	numbers=left,                           % Line nums position
+	numberstyle=\tiny,                      % Line-numbers fonts
+	stepnumber=1,                           % Step between two line-numbers
+	numbersep=5pt,                          % How far are line-numbers from code
+	backgroundcolor=\color{lightlightgray}, % Choose background color
+	frame=none,                             % A frame around the code
+	tabsize=2,                              % Default tab size
+	captionpos=t,                           % Caption-position = bottom
+	breaklines=true,                        % Automatic line breaking?
+	breakatwhitespace=false,                % Automatic breaks only at whitespace?
+	showspaces=false,                       % Dont make spaces visible
+	showtabs=false,                         % Dont make tabls visible
+	columns=flexible,                       % Column format
+	morekeywords={__global__, __device__},  % CUDA specific keywords
+}
+
+\newcommand{\task}[1]{\section*{\normalsize #1}}
+% \newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+% \newcommand{\extraspace}[]{
+%     \begin{center}
+%         \textbf{Use this page for extra space.}
+%     \end{center}
+% }
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+
+
+\begin{document}
+\begin{center}
+    {\Large \textsc{Lab 4}}
+\end{center}
+\begin{center}
+    Due: Friday 10/06/2023 @ 11:59pm EST
+\end{center}
+
+\noindent The purpose of labs is to give you some hands on experience programming the things we've talked about in lecture.
+This lab will focus on learning (i.e. ``fitting'') using ``hard'' expectation maximization through the KMeans clustering algorithm.
+You will segment each point into its closest cluster in the \texttt{estep} method and recalculate each cluster in the \texttt{mstep} method.
+\newline
+
+
+\task{Task 0: Setup}
+Included with this file is a new file called \texttt{requirements.txt}. This file is rather special in Python: it is the convention used to communicate dependencies that your code depends on. For instance, if you open this file, you will see entries for \texttt{numpy} and \texttt{scikit-learn}: two pythn packages we will need in order to run the code in this lab. You can download and install these python packages through \texttt{pip}, which is python's package manager. While there are many ways of invoking \texttt{pip}, I like to do the following:
+$$\texttt{python3 -m pip install -r requirements.txt}$$
+(I let \texttt{python3} figure out which \texttt{pip} is attached to it rather than the more common usage: \texttt{pip install -r requirements.txt})
+
+
+
+\task{Task 1: \texttt{class KMeans} (100 points)}
+In the file \texttt{kmeans.py}, you will find a class called \texttt{KMeans}.
+This class has a few methods in it, but I want you to pay attention to two of them in particular: \texttt{estep} and \texttt{mstep}.
+These method implement the E-step and M-step of an EM iteration respectively, and it is what you will need to finish in this lab.
+Your code should work for an arbitrary number of clusters as well as with data of arbitrary dimensionality.
+The number of clusters is specified at object construction time and is stored in a field called \texttt{self.num\_clusters}.
+Please implement the following:
+
+\begin{itemize}
+    \item\texttt{estep}. This method takes in a parameter \texttt{X}, which is a numpy array storing a column vector.
+    It should have shape of (\textit{num\_examples}, d), where \textit{num\_examples} is the number of data points in the dataset, and \texttt{d} is the dimensionality of each point.
+    Your E-step method should calculate and return the index of the closest cluster to each point inside a column vector. This means that the output should have shape \texttt{(num\_examples, 1)} and contain integer values $\ge 0$.
+    In KMeans we measure the distance between a point $\vec{x_i}$ and a cluster center $\vec{c_j}$ using square euclidean distance:
+$$d(\vec{x_i} \vec{c_j}) = \sum\limits_{m=1}^d (\vec{x_i}_m - \vec{c_j}_m)^2$$
+where $d$ is the dimensionality of every point (and also the dimensionality of every cluster center). The index of the closest cluster to point $\vec{x_i}$ can be calculated using the following equation:
+$$j^* = \argmin\limits_{1\le j\le k} d(\vec{x_i}, \vec{c_j})$$
+
+\noindent \textit{Note:} If there are ties for the closest cluster, please choose the cluster with the smallest index. For example, if clusters 3, 8, 13, and 12 all tie for being the closest to point $\vec{x_i}$,
+please assign $\vec{x_i}$ to cluster 3 since it has the smallest cluster index.
+
+    \item\texttt{mstep}. This method takes two arguments: \texttt{X} and \texttt{cluster\_idx\_assignments}. \texttt{X} contains the data matrix just like in E-step, while \texttt{cluster\_idx\_assignments} contains
+    the column vector that is the output of the E-step method. In the M-step method you will need to recalculate the cluster centers using the following equation:
+\begin{align*}
+    \vec{c_j}^*        &= \frac{1}{|c_j|}\sum\limits_{\vec{x}\in c_j} \vec{x}
+\end{align*}
+This equation says that the new cluster center is the mean of the points assigned to that cluster in the E-step.
+
+\noindent\textit{Note:} If a cluster is not assigned any points to it in the E-step (this can happen!), the cluster does not change (i.e. the cluster center does not change).\newline
+\noindent\textit{Note:} when we take the mean of a bunch of vectors, we handle each component separately. This means that the mean is a new vector where the x component of the mean vector is the mean of the input vectors,
+the y component of the mean vector is the mean of the y components of the input vectors, etc.
+
+\end{itemize}
+
+
+\noindent Feel free to run the \texttt{kmeans.py} file, there is some basic testing at the bottom of the file that will be run if you run the file.
+I would recommend adding some of your own testing (what shape is what, etc) to increase your confidence in the correctness of your solution before you submit to the autograder.
+The autograder will take a few minutes to run!
+
+
+\task{Task 4: Submit Your Lab}
+To complete your lab, please \textbf{only turn in the \texttt{kmeans.py} file} on Gradescope. You shouldn't have to worry about zipping it up or anything, just drag and drop it in.
+
+\end{document}
+
