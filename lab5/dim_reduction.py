@@ -88,8 +88,7 @@ def check_if_distance_satisfied(X: np.ndarray,          # the original dataset
             dist_in_reduced_space = np.linalg.norm(X_reduced[i, :] - X_reduced[j, :], ord=2)
             
             # Check the Johnson-Lindenstrauss lemma conditions
-            if not ((1 - epsilon) * dist_in_og_space <= dist_in_reduced_space <= (1 + epsilon) * dist_in_og_space):
-                print(f"The lemma is not satisfied for points i = {i} and j = {j}")
+            if not (((1 - epsilon) * dist_in_og_space <= dist_in_reduced_space) and (dist_in_reduced_space <= (1 + epsilon) * dist_in_og_space)):
                 return False
     
     return True
