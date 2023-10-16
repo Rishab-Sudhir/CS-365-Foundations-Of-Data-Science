@@ -76,6 +76,9 @@ def calculate_distances(X: np.ndarray,
                         X_reconstructed: np.ndarray
                         ) -> np.ndarray:
     # TODO: complete me!
+    
+    return np.linalg.norm(X-X_reconstructed, ord=2, axis = 1)
+    # Axis defines the axis along which we sum, look at lab 6 hand written notes for more explanations
     ...
 
 
