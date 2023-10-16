@@ -85,8 +85,9 @@ def calculate_distances(X: np.ndarray,
 def z_score(distances: np.ndarray) -> np.ndarray:
     # TODO: complete me!
     ...
-
-
+    return (distances - np.mean(distances))/np.std(distances)
+     # calculating z scores
+     
 def get_outlier_idxs(z_scores: np.ndarray,
                      threshold: float
                      ) -> np.ndarray:
