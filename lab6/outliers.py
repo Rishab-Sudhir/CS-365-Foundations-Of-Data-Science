@@ -91,6 +91,10 @@ def z_score(distances: np.ndarray) -> np.ndarray:
 def get_outlier_idxs(z_scores: np.ndarray,
                      threshold: float
                      ) -> np.ndarray:
+    mask = np.abs(z_score) > threshold
+    #mask is a bolean array that contains true/false values for each value in the z_scores np array
+    return np.argwhere(mask)
+    #np.argwhere returns the indicies of any non_zero values in the input array: boolean in python(false/true) equate to 0/1
     # TODO: complete me!
     ...
 
