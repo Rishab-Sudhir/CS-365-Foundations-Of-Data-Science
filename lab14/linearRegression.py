@@ -18,7 +18,12 @@ import os                                                       # manipulating p
 LinearRegressionType = Type["LinearRegression"]
 
 
- def fit(self: LinearRegressionType,
+class LinearRegression(object):
+    def __init__(self: LinearRegressionType) -> None:
+        self.weights: np.ndarray = None
+
+
+    def fit(self: LinearRegressionType,
             X: np.ndarray,
             y_gt: np.ndarray
             ) -> LinearRegressionType:
@@ -26,7 +31,7 @@ LinearRegressionType = Type["LinearRegression"]
         # TODO: complete me!
         # This method should populate self.weights
 
-         #Pad X with a row of 1's
+        #Pad X with a row of 1's
         n_rows, n_cols = X.shape
         X_pad = np.hstack([X, np.ones((n_rows, 1), dtype=float)])
 
@@ -45,12 +50,10 @@ LinearRegressionType = Type["LinearRegression"]
         # This method should use the self.weights
         # you set to make predictions on X!
 
-
         slope_part = X @ self.weights[:-1, :]
         intercept_part = self.weights[-1]
         pred = slope_part +intercept_part
         return pred
-
 
 
 def test_1d(num_samples: int) -> Tuple[np.ndarray, np.ndarray]:
